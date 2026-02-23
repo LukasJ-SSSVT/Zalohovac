@@ -1,0 +1,17 @@
+﻿[
+  {
+    "id": 1,
+    "sources": [
+      "C:\\Users\\jandalukas\\Desktop\\Nová složka"
+    ],
+    "targets": [
+      "C:\\Users\\jandalukas\\Desktop\\Nová složka (2)"
+    ],
+    "method": "incremental",
+    "timing": "* * * * *",
+    "retention": {
+      "count": 2,
+      "size": 5
+    }
+  }
+]

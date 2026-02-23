@@ -8,5 +8,8 @@ namespace Editor.Components
 {
     public interface IComponent
     {
+        public void HandleKey(ConsoleKeyInfo info);
+
+        public void Draw();
     }
 }

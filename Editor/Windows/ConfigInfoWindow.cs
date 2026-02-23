@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Editor.Windows
 {
-    public class ConfigWindow : Window
+    public class ConfigInfoWindow : Window
     {
         public override void Draw()
         {
-            
+            throw new NotImplementedException();
         }
 
         public override void HandleKey(ConsoleKeyInfo info)
         {
-            
+            throw new NotImplementedException();
         }
     }
 }
