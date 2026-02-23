@@ -15,13 +15,15 @@ namespace Editor.Components
 
         public Point Location { get; set; }
 
-        public Button(Point location)
+        public Button(Point location, string label)
         {
             this.Location = location;
+            this.Label = label;
         }
 
         public void Draw()
         {
+            Console.SetCursorPosition(Location.X, Location.Y);
             Console.WriteLine(Label);
         }
 
