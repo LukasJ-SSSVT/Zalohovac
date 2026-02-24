@@ -14,34 +14,38 @@ namespace Editor.Windows
         {
             this.backupJob = backupJob;
 
-            Textbox textbox = new Textbox(new Point(Console.WindowWidth / 2 + 3, 2), "Název", this.backupJob.Name, 2);
+            this.ComponentOffset = Console.BufferWidth / 2 + 3;
+
+            this.IsOnLeft = false;
+
+            Textbox textbox = new Textbox(new Point(0,0), "Název", this.backupJob.Name, 2);
             textbox.TextChanged += this.ChangeText;
             this.Components.Add(textbox);
 
-            Button buttonMethod = new Button(new Point(Console.WindowWidth / 2 + 3, 6), "Metoda", 2) { Text = this.backupJob.BackupType.ToString() };
+            Button buttonMethod = new Button(new Point(0,0), "Metoda", 2) { Text = this.backupJob.BackupType.ToString() };
             this.Components.Add(buttonMethod);
 
-            Button buttonTiming = new Button(new Point(Console.WindowWidth / 2 + 3, 10), "Časování", 2) { Text = this.backupJob.Timing.ToString() };
+            Button buttonTiming = new Button(new Point(0, 0), "Časování", 2) { Text = this.backupJob.Timing.ToString() };
             this.Components.Add(buttonTiming);
 
-            Button buttonRetention = new Button(new Point(Console.WindowWidth / 2 + 3, 14), "Retence", 2) { Text = $"Počet záloh: {this.backupJob.BackupRetention.Count.ToString()} o velikosti {this.backupJob.BackupRetention.Size.ToString()}" };
+            Button buttonRetention = new Button(new Point(0, 0), "Retence", 2) { Text = $"Počet záloh: {this.backupJob.BackupRetention.Count.ToString()} o velikosti {this.backupJob.BackupRetention.Size.ToString()}" };
             this.Components.Add(buttonRetention);
 
-            Button buttonSources = new Button(new Point(Console.WindowWidth / 2 + 3, 18), "Zdroje", 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
+            Button buttonSources = new Button(new Point(0, 0), "Zdroje", 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
             this.Components.Add(buttonSources);
 
-            Button buttonTargets = new Button(new Point(Console.WindowWidth / 2 + 3, 22), "Cíle", 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
+            Button buttonTargets = new Button(new Point(0, 0), "Cíle", 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
             this.Components.Add(buttonTargets);
 
-            Button buttonOK = new Button(new Point(Console.WindowWidth / 2 + 3, 26), "OK", 1);
+            Button buttonOK = new Button(new Point(0, 0), "OK", 1);
             buttonOK.Clicked += this.ButtonOK;
             this.Components.Add(buttonOK);
 
-            Button buttonCancel = new Button(new Point(Console.WindowWidth / 2 + 3, 29), "Storno", 1);
+            Button buttonCancel = new Button(new Point(0, 0), "Storno", 1);
             buttonCancel.Clicked += this.ButtonCancel;
             this.Components.Add(buttonCancel);
 
-            this.IsOnLeft = false;
+            this.ComponentPositions(this.ComponentOffset);
         }
 
         public override void HandleKey(ConsoleKeyInfo info)

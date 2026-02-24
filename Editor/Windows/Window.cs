@@ -12,6 +12,8 @@ namespace Editor.Windows
     {
         public Application Application { get; set; }
 
+        public int ComponentOffset { get; set; }
+
         public abstract void HandleKey(ConsoleKeyInfo info);
 
         public List<Component> Components = new List<Component>();
@@ -73,6 +75,16 @@ namespace Editor.Windows
                         Console.Write(" ");
                     }
                 }
+            }
+        }
+
+        public void ComponentPositions(int offset)
+        {
+            int i = 2;
+            foreach (Component component in this.Components)
+            {
+                component.Location = new Point(offset, i);
+                i = i + component.Height + 2;
             }
         }
     }

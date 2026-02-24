@@ -13,7 +13,7 @@ namespace Editor.Models
         public int Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "Nová záloha";
 
         [JsonPropertyName("sources")]
         public List<string> Sources { get; set; } = new List<string>();

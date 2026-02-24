@@ -22,18 +22,20 @@ namespace Editor.Windows
 
             this.backupJobs = this.service.GetAllBackupJobs();
 
-            int i = 2;
+            this.ComponentOffset = 3;
+
             foreach (BackupJob backupJob in this.backupJobs)
             {
-                Button button = new Button(new Point(3, i), backupJob.Name, 1);
+                Button button = new Button(new Point(0, 0), backupJob.Name, 1);
                 button.Clicked += this.ButtonClicked;
                 this.Components.Add(button);
-                i = i + 3;
             }
 
-            Button buttonAdd = new Button(new Point(3, i), "Vytvořit zálohu", 1);
+            Button buttonAdd = new Button(new Point(0, 0), "Vytvořit zálohu", 1);
             buttonAdd.Clicked += this.CreateBackup;
             this.Components.Add(buttonAdd);
+
+            this.ComponentPositions(this.ComponentOffset);
 
             this.IsOnLeft = true;
         }
@@ -48,12 +50,16 @@ namespace Editor.Windows
             {
                 this.KeyUp();
             }
+            else if (info.Key == ConsoleKey.Delete)
+            {
+                this.DeleteBackup();
+            }
             else
             {
                 this.Components[this.SelectedIndex].HandleKey(info);
             }
         }
-       
+
         private void KeyUp()
         {
             this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
@@ -62,6 +68,15 @@ namespace Editor.Windows
         private void KeyDown()
         {
             this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
+        }
+
+        private void DeleteBackup()
+        {
+            if (this.SelectedIndex == this.Components.Count - 1) { return; }
+            this.Components.RemoveAt(this.SelectedIndex);
+            this.backupJobs.RemoveAt(this.SelectedIndex);
+
+            this.ComponentPositions(this.ComponentOffset);
         }
 
         private void ButtonClicked()
@@ -74,15 +89,15 @@ namespace Editor.Windows
         private void CreateBackup()
         {
             this.backupJobs.Insert(this.SelectedIndex, new BackupJob()
-            {
-                Name = "Nová záloha",
+            {                
                 Id = this.backupJobs[this.SelectedIndex - 1].Id + 1,
             });
 
-            Button button = new Button(new Point(3, (this.Components.Count() - 2) * 3 + 5), "Nová záloha", 1);
+            Button button = new Button(new Point(0, 0), "Nová záloha", 1);
             button.Clicked += this.ButtonClicked;
             this.Components.Insert(this.SelectedIndex, button);
-            this.Components[this.SelectedIndex + 1].Location = new Point(3, (this.Components.Count() - 2) * 3 + 5); 
+
+            this.ComponentPositions(this.ComponentOffset);
         }
 
         private void Update(BackupJob backupJob)
