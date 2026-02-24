@@ -4,37 +4,37 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Editor.Components
 {
-    public class Textbox : IComponent
+    public class Textbox : Component
     {
-        public string Label { get; set; }
-
-        public string Value { get; set; }
-
         public event Action<string> TextChanged;
 
-        public Point Location { get; set; }
-
-        public Textbox(Point location)
+        public Textbox(Point location, string label, string value, int height)
         {
             this.Location = location;
+            this.Label = label;
+            this.Text = value;
+            this.Height = height;
         }
 
-        public void Draw()
+        public override void Draw()
         {
-            Console.WriteLine(Label);
-            Console.WriteLine($"_{Value.PadRight(20, '_')}_");
+            Console.SetCursorPosition(Location.X, Location.Y);
+            Console.Write(Label);
+            Console.SetCursorPosition(Location.X + 3, Location.Y + 1);
+            Console.Write(Text);
         }
 
-        public void HandleKey(ConsoleKeyInfo info)
+        public override void HandleKey(ConsoleKeyInfo info)
         {
             if (info.Key == ConsoleKey.Backspace)
             {
-                if (!string.IsNullOrEmpty(Value))
+                if (!string.IsNullOrEmpty(Text))
                 {
-                    this.Value = this.Value.Substring(0, this.Value.Length - 1);
+                    this.Text = this.Text.Substring(0, this.Text.Length - 1);
                 }
             }
             else if (info.Key == ConsoleKey.Enter)
@@ -43,10 +43,10 @@ namespace Editor.Components
             }
             else if (!char.IsControl(info.KeyChar))
             {
-                this.Value += info.KeyChar;
+                this.Text += info.KeyChar;
             }
 
-            this.TextChanged?.Invoke(this.Value);
+            this.TextChanged?.Invoke(this.Text);
         }
     }
 }

@@ -16,52 +16,26 @@ namespace Editor.Windows
 
         private DataService service = new DataService();
 
-        private int selectedIndex = 0;
-
-        private List<IComponent> components = new List<IComponent>();
-
-        public ConfigWindow()
+        public ConfigWindow(Application app)
         {
+            this.Application = app;
+
             this.backupJobs = this.service.GetAllBackupJobs();
 
             int i = 2;
             foreach (BackupJob backupJob in this.backupJobs)
             {
-                Button button = new Button(new Point(3, i), backupJob.Id.ToString());
+                Button button = new Button(new Point(3, i), backupJob.Name, 1);
                 button.Clicked += this.ButtonClicked;
-                this.components.Add(button);
+                this.Components.Add(button);
                 i = i + 3;
             }
-        }
 
-        public override void Draw()
-        {
-            int i = 0;
-            foreach (Button button in this.components)
-            {
-                this.ChangeBackgroundColor(button.Location, ConsoleColor.Black);
+            Button buttonAdd = new Button(new Point(3, i), "Vytvořit zálohu", 1);
+            buttonAdd.Clicked += this.CreateBackup;
+            this.Components.Add(buttonAdd);
 
-                if (i++ == this.selectedIndex)
-                {
-                    this.ChangeBackgroundColor(button.Location, ConsoleColor.Blue);
-                }
-                button.Draw();
-                Console.ResetColor();
-            }
-        }
-
-        private void ChangeBackgroundColor(Point location, ConsoleColor color)
-        {
-            Console.BackgroundColor = color;
-
-            for (int j = -1; j < 2; j++)
-            {
-                Console.SetCursorPosition(location.X - 1, location.Y + j);
-                for (int i = 0; i < Console.WindowWidth / 2 - 3; i++)
-                {
-                    Console.Write(" ");
-                }
-            }
+            this.IsOnLeft = true;
         }
 
         public override void HandleKey(ConsoleKeyInfo info)
@@ -76,23 +50,45 @@ namespace Editor.Windows
             }
             else
             {
-                this.components[this.selectedIndex].HandleKey(info);
+                this.Components[this.SelectedIndex].HandleKey(info);
             }
         }
        
         private void KeyUp()
         {
-            this.selectedIndex = Math.Max(--this.selectedIndex, 0);
+            this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
         }
 
         private void KeyDown()
         {
-            this.selectedIndex = Math.Min(++this.selectedIndex, this.backupJobs.Count - 1);
+            this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
         }
 
         private void ButtonClicked()
         {
-            this.Application.SwitchWindow(new ConfigInfoWindow());
+            ConfigInfoWindow configInfoWindow = new ConfigInfoWindow(this.backupJobs[this.SelectedIndex].Clone());
+            configInfoWindow.UpdateJobs += this.Update;
+            this.Application.SwitchWindowForward(configInfoWindow);
+        }
+
+        private void CreateBackup()
+        {
+            this.backupJobs.Insert(this.SelectedIndex, new BackupJob()
+            {
+                Name = "Nová záloha",
+                Id = this.backupJobs[this.SelectedIndex - 1].Id + 1,
+            });
+
+            Button button = new Button(new Point(3, (this.Components.Count() - 2) * 3 + 5), "Nová záloha", 1);
+            button.Clicked += this.ButtonClicked;
+            this.Components.Insert(this.SelectedIndex, button);
+            this.Components[this.SelectedIndex + 1].Location = new Point(3, (this.Components.Count() - 2) * 3 + 5); 
+        }
+
+        private void Update(BackupJob backupJob)
+        {
+            this.backupJobs[this.SelectedIndex] = backupJob;
+            this.Components[this.SelectedIndex].Label = this.backupJobs[this.SelectedIndex].Name.ToString();
         }
     }
 }

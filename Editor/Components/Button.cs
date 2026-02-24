@@ -7,27 +7,26 @@ using System.Threading.Tasks;
 
 namespace Editor.Components
 {
-    public class Button : IComponent
+    public class Button : Component
     {
-        public string Label { get; set; }
-
         public event Action Clicked;
 
-        public Point Location { get; set; }
-
-        public Button(Point location, string label)
+        public Button(Point location, string label, int height)
         {
             this.Location = location;
             this.Label = label;
+            this.Height = height;
         }
 
-        public void Draw()
+        public override void Draw()
         {
             Console.SetCursorPosition(Location.X, Location.Y);
-            Console.WriteLine(Label);
+            Console.Write(Label);
+            Console.SetCursorPosition(Location.X + 3, Location.Y + 1);
+            Console.Write(Text);
         }
 
-        public void HandleKey(ConsoleKeyInfo info)
+        public override void HandleKey(ConsoleKeyInfo info)
         {
             if (info.Key == ConsoleKey.Enter)
             {

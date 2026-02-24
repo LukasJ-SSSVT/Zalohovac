@@ -6,6 +6,7 @@
         {
             // use stack for windows
             // don't use console.writeline but cursore position
+            Console.CursorVisible = false;
 
             Application app = new Application();
             app.Run();
