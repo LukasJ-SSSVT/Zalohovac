@@ -26,16 +26,16 @@ namespace Editor.Windows
 
             foreach (BackupJob backupJob in this.backupJobs)
             {
-                Button button = new Button(new Point(0, 0), backupJob.Name, 1);
+                Button button = new Button(backupJob.Name, 1);
                 button.Clicked += this.ButtonClicked;
                 this.Components.Add(button);
             }
 
-            Button buttonAdd = new Button(new Point(0, 0), "Vytvořit zálohu", 1);
+            Button buttonAdd = new Button("Vytvořit zálohu", 1);
             buttonAdd.Clicked += this.CreateBackup;
             this.Components.Add(buttonAdd);
 
-            this.ComponentPositions(this.ComponentOffset);
+            this.ComponentPositionsVertical(this.ComponentOffset);
 
             this.IsOnLeft = true;
         }
@@ -60,6 +60,22 @@ namespace Editor.Windows
             }
         }
 
+        public override void Draw()
+        {
+            this.Clear(IsOnLeft);
+
+            int i = 0;
+            foreach (Component component in this.Components)
+            {
+                if (i++ == this.SelectedIndex)
+                {
+                    this.HiglightRow(component.Location, component.Height, ConsoleColor.Blue);
+                }
+                component.Draw();
+                Console.ResetColor();
+            }
+        }
+
         private void KeyUp()
         {
             this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
@@ -76,7 +92,7 @@ namespace Editor.Windows
             this.Components.RemoveAt(this.SelectedIndex);
             this.backupJobs.RemoveAt(this.SelectedIndex);
 
-            this.ComponentPositions(this.ComponentOffset);
+            this.ComponentPositionsVertical(this.ComponentOffset);
         }
 
         private void ButtonClicked()
@@ -93,11 +109,11 @@ namespace Editor.Windows
                 Id = this.backupJobs[this.SelectedIndex - 1].Id + 1,
             });
 
-            Button button = new Button(new Point(0, 0), "Nová záloha", 1);
+            Button button = new Button("Nová záloha", 1);
             button.Clicked += this.ButtonClicked;
             this.Components.Insert(this.SelectedIndex, button);
 
-            this.ComponentPositions(this.ComponentOffset);
+            this.ComponentPositionsVertical(this.ComponentOffset);
         }
 
         private void Update(BackupJob backupJob)

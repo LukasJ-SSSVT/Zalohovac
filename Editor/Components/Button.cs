@@ -11,9 +11,8 @@ namespace Editor.Components
     {
         public event Action Clicked;
 
-        public Button(Point location, string label, int height)
+        public Button(string label, int height)
         {
-            this.Location = location;
             this.Label = label;
             this.Height = height;
         }

@@ -1,12 +1,15 @@
 ﻿using Editor.Components;
 using Editor.Models;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace Editor.Windows
 {
     public class ConfigInfoWindow : Window
     {
         private BackupJob backupJob = new BackupJob();
+
+        private BackupType backupType = new BackupType();
 
         public event Action<BackupJob> UpdateJobs;
 
@@ -18,34 +21,35 @@ namespace Editor.Windows
 
             this.IsOnLeft = false;
 
-            Textbox textbox = new Textbox(new Point(0,0), "Název", this.backupJob.Name, 2);
+            Textbox textbox = new Textbox("Název", this.backupJob.Name, 2);
             textbox.TextChanged += this.ChangeText;
             this.Components.Add(textbox);
 
-            Button buttonMethod = new Button(new Point(0,0), "Metoda", 2) { Text = this.backupJob.BackupType.ToString() };
+            Button buttonMethod = new Button("Metoda", 2) { Text = this.backupJob.BackupType.ToString() };
+            buttonMethod.Clicked += this.ButtonMethod;
             this.Components.Add(buttonMethod);
 
-            Button buttonTiming = new Button(new Point(0, 0), "Časování", 2) { Text = this.backupJob.Timing.ToString() };
+            Button buttonTiming = new Button("Časování", 2) { Text = this.backupJob.Timing.ToString() };
             this.Components.Add(buttonTiming);
 
-            Button buttonRetention = new Button(new Point(0, 0), "Retence", 2) { Text = $"Počet záloh: {this.backupJob.BackupRetention.Count.ToString()} o velikosti {this.backupJob.BackupRetention.Size.ToString()}" };
+            Button buttonRetention = new Button("Retence", 2) { Text = $"Počet záloh: {this.backupJob.BackupRetention.Count.ToString()} o velikosti {this.backupJob.BackupRetention.Size.ToString()}" };
             this.Components.Add(buttonRetention);
 
-            Button buttonSources = new Button(new Point(0, 0), "Zdroje", 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
+            Button buttonSources = new Button("Zdroje", 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
             this.Components.Add(buttonSources);
 
-            Button buttonTargets = new Button(new Point(0, 0), "Cíle", 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
+            Button buttonTargets = new Button("Cíle", 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
             this.Components.Add(buttonTargets);
 
-            Button buttonOK = new Button(new Point(0, 0), "OK", 1);
+            Button buttonOK = new Button("OK", 1);
             buttonOK.Clicked += this.ButtonOK;
             this.Components.Add(buttonOK);
 
-            Button buttonCancel = new Button(new Point(0, 0), "Storno", 1);
+            Button buttonCancel = new Button("Storno", 1);
             buttonCancel.Clicked += this.ButtonCancel;
             this.Components.Add(buttonCancel);
 
-            this.ComponentPositions(this.ComponentOffset);
+            this.ComponentPositionsVertical(this.ComponentOffset);
         }
 
         public override void HandleKey(ConsoleKeyInfo info)
@@ -61,6 +65,22 @@ namespace Editor.Windows
             else
             {
                 this.Components[this.SelectedIndex].HandleKey(info);
+            }
+        }
+
+        public override void Draw()
+        {
+            this.Clear(IsOnLeft);
+
+            int i = 0;
+            foreach (Component component in this.Components)
+            {
+                if (i++ == this.SelectedIndex)
+                {
+                    this.HiglightRow(component.Location, component.Height, ConsoleColor.Blue);
+                }
+                component.Draw();
+                Console.ResetColor();
             }
         }
 
@@ -90,6 +110,19 @@ namespace Editor.Windows
             this.Clear(this.IsOnLeft);
             this.UpdateJobs?.Invoke(this.backupJob);
             this.Application.SwitchWindowBack();
+        }
+
+        public void ButtonMethod()
+        {
+            List<string> methods = Enum.GetValues(typeof(BackupType)).Cast<BackupType>().Select(v => v.ToString()).ToList();
+            List<Component> components = new List<Component>();
+
+            foreach (string method in methods)
+            {
+                components.Add(new Button(method, 1));               
+            }
+
+            this.Application.SwitchWindowForward(new MethodWindow(components));
         }
     }
 }

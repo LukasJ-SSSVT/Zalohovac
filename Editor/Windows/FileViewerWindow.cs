@@ -8,7 +8,10 @@ namespace Editor.Windows
 {
     public class FileViewerWindow : Window
     {
-        
+        public override void Draw()
+        {
+            throw new NotImplementedException();
+        }
 
         public override void HandleKey(ConsoleKeyInfo info)
         {

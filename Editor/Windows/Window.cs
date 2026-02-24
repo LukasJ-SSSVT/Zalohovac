@@ -22,23 +22,9 @@ namespace Editor.Windows
 
         public bool IsOnLeft;
 
-        public void Draw()
-        {
-            this.Clear(IsOnLeft);
+        public abstract void Draw();       
 
-            int i = 0;
-            foreach (Component component in this.Components)
-            {
-                if (i++ == this.SelectedIndex)
-                {
-                    this.ChangeBackgroundColor(component.Location, component.Height, ConsoleColor.Blue);
-                }
-                component.Draw();
-                Console.ResetColor();
-            }
-        }
-
-        public void ChangeBackgroundColor(Point location, int height, ConsoleColor color)
+        public void HiglightRow(Point location, int height, ConsoleColor color)
         {
             Console.BackgroundColor = color;
 
@@ -78,13 +64,21 @@ namespace Editor.Windows
             }
         }
 
-        public void ComponentPositions(int offset)
+        public void ComponentPositionsVertical(int offset)
         {
             int i = 2;
             foreach (Component component in this.Components)
             {
                 component.Location = new Point(offset, i);
                 i = i + component.Height + 2;
+            }
+        }
+
+        public void ComponentPositionsHorizontal(int windowWidth)
+        {
+            for (int i = 0; i < this.Components.Count; i++)
+            {
+                this.Components[i].Location = new Point((Console.WindowWidth / 2 - windowWidth / 2 + windowWidth / this.Components.Count * i) + windowWidth / this.Components.Count / 2 - this.Components[i].Label.Length / 2, Console.WindowHeight / 2 + 1);
             }
         }
     }

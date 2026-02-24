@@ -12,9 +12,8 @@ namespace Editor.Components
     {
         public event Action<string> TextChanged;
 
-        public Textbox(Point location, string label, string value, int height)
+        public Textbox(string label, string value, int height)
         {
-            this.Location = location;
             this.Label = label;
             this.Text = value;
             this.Height = height;
