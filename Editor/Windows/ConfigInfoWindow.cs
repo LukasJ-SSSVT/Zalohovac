@@ -11,8 +11,6 @@ namespace Editor.Windows
     {
         private BackupJob backupJob = new BackupJob();
 
-        private BackupType backupType = new BackupType();
-
         public event Action<BackupJob> UpdateJobs;
 
         public event Action RedrawTable;
@@ -25,24 +23,24 @@ namespace Editor.Windows
 
             this.IsOnLeft = false;
 
-            Textbox textbox = new Textbox("Name", this.backupJob.Name, 2);
+            Textbox textbox = new Textbox(this.backupJob.GetPropertyNames()[0], this.backupJob.Name, 2);
             textbox.TextChanged += this.ChangeText;
             this.Components.Add(textbox);
 
-            Button buttonMethod = new Button("Method", 2) { Text = this.backupJob.Method.ToString() };
+            Button buttonMethod = new Button(this.backupJob.GetPropertyNames()[1], 2) { Text = this.backupJob.Method.ToString() };
             buttonMethod.Clicked += this.ButtonMethod;
             this.Components.Add(buttonMethod);
 
-            Button buttonTiming = new Button("Timing", 2) { Text = this.backupJob.Timing.ToString() };
+            Button buttonTiming = new Button(this.backupJob.GetPropertyNames()[2], 2) { Text = this.backupJob.Timing.ToString() };
             this.Components.Add(buttonTiming);
 
-            Button buttonRetention = new Button("Retention", 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti {this.backupJob.Retention.Size.ToString()}" };
+            Button buttonRetention = new Button(this.backupJob.GetPropertyNames()[3], 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti {this.backupJob.Retention.Size.ToString()}" };
             this.Components.Add(buttonRetention);
 
-            Button buttonSources = new Button("Sources", 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
+            Button buttonSources = new Button(this.backupJob.GetPropertyNames()[4], 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
             this.Components.Add(buttonSources);
 
-            Button buttonTargets = new Button("Targets", 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
+            Button buttonTargets = new Button(this.backupJob.GetPropertyNames()[5], 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
             this.Components.Add(buttonTargets);
 
             Button buttonOK = new Button("OK", 1);
@@ -136,16 +134,16 @@ namespace Editor.Windows
         {
             this.Components[this.SelectedIndex].Text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
 
-            PropertyInfo property = this.backupJob.GetType().GetProperty(this.Components[this.SelectedIndex].Label);
-            string stringProperty = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
+            PropertyInfo property = this.backupJob.GetType().GetProperty(this.backupJob.GetPropertyNames()[this.SelectedIndex]);
+            string value = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
 
-            object convertedProperty = stringProperty;
+            object convertedValue = value;
             if (property.PropertyType.IsEnum)
             {
-                convertedProperty = Enum.Parse(property.PropertyType, stringProperty);
+                convertedValue = Enum.Parse(property.PropertyType, value);
             }
 
-            property.SetValue(this.backupJob, convertedProperty);
+            property.SetValue(this.backupJob, convertedValue);
 
             this.RedrawTable?.Invoke();
             this.Application.SwitchWindowBack();

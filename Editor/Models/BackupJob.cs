@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -13,7 +14,17 @@ namespace Editor.Models
         public int Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; } = "Nová záloha";
+        public string Name {  get; set; } = "New backup";
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonPropertyName("method")]
+        public BackupType Method { get; set; } = BackupType.Full;
+
+        [JsonPropertyName("timing")]
+        public string Timing { get; set; } = "* * * * *";
+
+        [JsonPropertyName("retention")]
+        public BackupRetention Retention { get; set; } = new BackupRetention() { Count = 1, Size = 1 };
 
         [JsonPropertyName("sources")]
         public List<string> Sources { get; set; } = new List<string>();
@@ -21,16 +32,18 @@ namespace Editor.Models
         [JsonPropertyName("targets")]
         public List<string> Targets { get; set; } = new List<string>();
 
-        [JsonPropertyName("timing")]
-        public string Timing { get; set; } = "* * * * *";
+        public List<string> GetPropertyNames()
+        {
+            List<PropertyInfo> properties = this.GetType().GetProperties().ToList();
+            List<string> result = new List<string>();
 
-        [JsonPropertyName("retention")] 
-        public BackupRetention Retention { get; set; } = new BackupRetention() { Count = 1, Size = 1};
+            for (int i = 1; i < properties.Count; i++)
+            {
+                result.Add(properties[i].Name);
+            }
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        [JsonPropertyName("method")]
-        public BackupType Method { get; set; } = BackupType.Full;
-
+            return result;
+        }
 
         public BackupJob Clone()
         {
