@@ -136,7 +136,8 @@ namespace Editor.Windows
 
         private void ButtonBack()
         {
-            this.directories = new Directories(this.path.Substring(0, this.path.Length - this.path.Split('\\')[this.path.Split('\\').Count() - 1].Length - 1));
+            this.path = this.path.Substring(0, this.path.Length - this.path.Split('\\')[this.path.Split('\\').Count() - 1].Length - 1);
+            this.directories = new Directories(this.path);
             this.AddComponents();
         }
 
