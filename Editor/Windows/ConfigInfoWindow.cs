@@ -23,7 +23,7 @@ namespace Editor.Windows
 
             this.IsOnLeft = false;
 
-            Textbox textbox = new Textbox(this.backupJob.GetPropertyNames()[0], this.backupJob.Name, 2);
+            Textbox textbox = new Textbox(this.backupJob.GetPropertyNames()[0], this.backupJob.Name, 2, new Point(3, 1));
             textbox.TextChanged += this.ChangeText;
             this.Components.Add(textbox);
 
@@ -32,6 +32,7 @@ namespace Editor.Windows
             this.Components.Add(buttonMethod);
 
             Button buttonTiming = new Button(this.backupJob.GetPropertyNames()[2], 2) { Text = this.backupJob.Timing.ToString() };
+            buttonTiming.Clicked += this.ButtonTiming;
             this.Components.Add(buttonTiming);
 
             Button buttonRetention = new Button(this.backupJob.GetPropertyNames()[3], 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti {this.backupJob.Retention.Size.ToString()}" };
@@ -115,7 +116,7 @@ namespace Editor.Windows
             this.Application.SwitchWindowBack();
         }
 
-        public void ButtonMethod()
+        private void ButtonMethod()
         {
             List<string> methods = Enum.GetValues(typeof(BackupType)).Cast<BackupType>().Select(v => v.ToString()).ToList();
             List<Component> components = new List<Component>();
@@ -127,15 +128,28 @@ namespace Editor.Windows
                 components.Add(button);
             }
 
-            this.Application.SwitchWindowForward(new MethodWindow("Choose a method", components, 60, 10));
+            this.Application.SwitchWindowForward(new EditWindow("Choose a method", components, 60, 10));
+        }
+
+        private void ButtonTiming()
+        {
+            List<Component> components = new List<Component>();
+            Textbox textbox = new Textbox("", this.Components[2].Text, 1, new Point(0, 0));
+            textbox.Clicked += this.EditWindowClick;
+            components.Add(textbox);
+
+            this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 50, 10));
         }
 
         private void EditWindowClick()
         {
-            this.Components[this.SelectedIndex].Text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
+            string text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
+            if (this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex] is Textbox) { text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Text; }
+
+            this.Components[this.SelectedIndex].Text = text;
 
             PropertyInfo property = this.backupJob.GetType().GetProperty(this.backupJob.GetPropertyNames()[this.SelectedIndex]);
-            string value = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
+            string value = text;
 
             object convertedValue = value;
             if (property.PropertyType.IsEnum)

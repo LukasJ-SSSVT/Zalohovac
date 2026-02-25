@@ -78,7 +78,13 @@ namespace Editor.Windows
         {
             for (int i = 0; i < this.Components.Count; i++)
             {
-                this.Components[i].Location = new Point((Console.WindowWidth / 2 - windowWidth / 2 + windowWidth / this.Components.Count * i) + windowWidth / this.Components.Count / 2 - this.Components[i].Label.Length / 2, Console.WindowHeight / 2 + windowHeight / 2 - 3);
+                int textLenght = this.Components[i].Label.Length;
+                if (this.Components[i] is Textbox)
+                {
+                    textLenght = this.Components[i].Text.Length;
+                }
+
+                this.Components[i].Location = new Point((Console.WindowWidth / 2 - windowWidth / 2 + windowWidth / this.Components.Count * i) + windowWidth / this.Components.Count / 2 - textLenght / 2, Console.WindowHeight / 2 + windowHeight / 2 - 3);
             }
         }
     }

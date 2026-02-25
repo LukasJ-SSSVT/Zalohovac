@@ -10,7 +10,7 @@ using Component = Editor.Components.Component;
 
 namespace Editor.Windows
 {
-    public class MethodWindow : Window
+    public class EditWindow : Window
     {
         private string label;
 
@@ -18,7 +18,7 @@ namespace Editor.Windows
 
         private int windowHeight;
 
-        public MethodWindow(string label, List<Component> components, int windowWidth, int windowHeight)
+        public EditWindow(string label, List<Component> components, int windowWidth, int windowHeight)
         {
             this.label = label;
             this.Components = components;
@@ -30,6 +30,7 @@ namespace Editor.Windows
 
         public override void Draw()
         {
+            this.ComponentPositionsHorizontal(this.windowWidth, this.windowHeight);
             this.MakeBackground();
 
             Console.SetCursorPosition(Console.WindowWidth / 2 - this.label.Length / 2, Console.WindowHeight / 2 - this.windowHeight / 2 + 1);

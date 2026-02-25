@@ -12,8 +12,13 @@ namespace Editor.Components
     {
         public event Action<string> TextChanged;
 
-        public Textbox(string label, string value, int height)
+        public event Action Clicked;
+
+        private Point offset;
+
+        public Textbox(string label, string value, int height, Point offset)
         {
+            this.offset = offset;
             this.Label = label;
             this.Text = value;
             this.Height = height;
@@ -23,7 +28,7 @@ namespace Editor.Components
         {
             Console.SetCursorPosition(Location.X, Location.Y);
             Console.Write(Label);
-            Console.SetCursorPosition(Location.X + 3, Location.Y + 1);
+            Console.SetCursorPosition(Location.X + offset.X, Location.Y + offset.Y);
             Console.Write(Text);
         }
 
@@ -38,7 +43,7 @@ namespace Editor.Components
             }
             else if (info.Key == ConsoleKey.Enter)
             {
-
+                this.Clicked?.Invoke();
             }
             else if (!char.IsControl(info.KeyChar))
             {
