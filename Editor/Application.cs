@@ -12,8 +12,7 @@ namespace Editor
         public Stack<Window> Windows = new Stack<Window>();
 
         public Application()
-        {
-            //this.SwitchWindow(new ConfigWindow());          
+        {   
             this.Windows.Push(new ConfigWindow(this));
 
             this.DrawBorder();

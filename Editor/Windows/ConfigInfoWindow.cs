@@ -1,9 +1,11 @@
 ﻿using Editor.Components;
 using Editor.Models;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Editor.Windows
 {
@@ -35,13 +37,16 @@ namespace Editor.Windows
             buttonTiming.Clicked += this.ButtonTiming;
             this.Components.Add(buttonTiming);
 
-            Button buttonRetention = new Button(this.backupJob.GetPropertyNames()[3], 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti {this.backupJob.Retention.Size.ToString()}" };
+            Button buttonRetention = new Button(this.backupJob.GetPropertyNames()[3], 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti: {this.backupJob.Retention.Size.ToString()}" };
+            buttonRetention.Clicked += this.ButtonRetention;
             this.Components.Add(buttonRetention);
 
             Button buttonSources = new Button(this.backupJob.GetPropertyNames()[4], 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
+            buttonSources.Clicked += this.ButtonFiles;
             this.Components.Add(buttonSources);
 
             Button buttonTargets = new Button(this.backupJob.GetPropertyNames()[5], 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
+            buttonTargets.Clicked += this.ButtonFiles;
             this.Components.Add(buttonTargets);
 
             Button buttonOK = new Button("OK", 1);
@@ -141,15 +146,33 @@ namespace Editor.Windows
             this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 50, 10));
         }
 
+        private void ButtonRetention()
+        {
+            List<Component> components = new List<Component>();
+            Textbox textboxCount = new Textbox("", this.backupJob.Retention.Count.ToString(), 1, new Point(0, 0));
+            components.Add(textboxCount);
+            Textbox textboxSize = new Textbox("", this.backupJob.Retention.Size.ToString(), 1, new Point(0, 0));
+            components.Add(textboxSize);
+            Button button = new Button("OK", 1);
+            button.Clicked += this.RetentionClick;
+            components.Add(button);
+
+            this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups", components, 50, 10));
+        }
+
+        private void ButtonFiles()
+        {
+            this.Application.SwitchWindowForward(new FileSelectorWindow(this.backupJob.Sources.First(), this.Application));
+        }
+
         private void EditWindowClick()
         {
-            string text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
-            if (this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex] is Textbox) { text = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Text; }
+            string value = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Label;
+            if (this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex] is Textbox) { value = this.Application.Windows.Peek().Components[this.Application.Windows.Peek().SelectedIndex].Text; }
 
-            this.Components[this.SelectedIndex].Text = text;
+            this.Components[this.SelectedIndex].Text = value;
 
             PropertyInfo property = this.backupJob.GetType().GetProperty(this.backupJob.GetPropertyNames()[this.SelectedIndex]);
-            string value = text;
 
             object convertedValue = value;
             if (property.PropertyType.IsEnum)
@@ -161,6 +184,45 @@ namespace Editor.Windows
 
             this.RedrawTable?.Invoke();
             this.Application.SwitchWindowBack();
+        }
+
+        private void RetentionClick()
+        {
+            this.backupJob.Retention.Count = Convert.ToInt32(this.Application.Windows.Peek().Components[0].Text);
+            this.backupJob.Retention.Size = Convert.ToInt32(this.Application.Windows.Peek().Components[1].Text);
+
+            List<string> list = new List<string>();
+            int j = 0;
+            foreach (PropertyInfo propertyInfo in this.backupJob.Retention.GetType().GetProperties())
+            {
+                list.Add(this.Application.Windows.Peek().Components[j++].Text);
+            }
+
+            this.Components[this.SelectedIndex].Text = this.SetComponentText(list);
+
+            this.RedrawTable?.Invoke();
+            this.Application.SwitchWindowBack();
+        }
+
+        private string SetComponentText(List<string> list)
+        {
+            StringBuilder result = new StringBuilder();
+
+            string[] str = this.Components[this.SelectedIndex].Text.Split(':');
+            result.Append(str[0]);
+
+            for (int i = 1; i < str.Length - 1; i++)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(str[i].Substring(1));
+
+                sb.Remove(0, str[i].Substring(1).IndexOf(' '));
+                sb.Insert(0, list[i - 1]);
+
+                result.Append(": " + sb);
+            }
+
+            return result.Append(": " + list[list.Count - 1]).ToString();
         }
     }
 }

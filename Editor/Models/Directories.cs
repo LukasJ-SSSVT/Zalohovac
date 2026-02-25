@@ -17,18 +17,14 @@ namespace Editor.Models
 
         public IEnumerator<DirectoryInfo> GetEnumerator()
         {
-            Stack<DirectoryInfo> stack = new Stack<DirectoryInfo>();
-            stack.Push(new DirectoryInfo(this.Path));
+            DirectoryInfo current = new DirectoryInfo(this.Path);
+            DirectoryInfo[] subDirs;
 
-            while (stack.Count > 0)
+            subDirs = current.GetDirectories();
+
+            foreach (DirectoryInfo dir in subDirs)
             {
-                DirectoryInfo current = stack.Pop();
-                yield return current;
-
-                foreach (DirectoryInfo subdir in current.GetDirectories())
-                {
-                    stack.Push(subdir);
-                }
+                yield return dir;
             }
         }
     }
