@@ -16,12 +16,18 @@ namespace Editor.Windows
 
         public event Action<string> DirectoryAdded;
 
+        public event Action<List<string>> SaveSource;
+
+        public event Action<List<string>> SaveTarget;
+
+        public event Action End;
+
         private FileViewerWindow fileViewer;
 
-        public FileSelectorWindow(string path, Application app)
+        public FileSelectorWindow(List<string> paths, Application app, bool IsSource)
         {
             this.Application = app;
-            this.path = path;
+            this.path = paths[0];
             this.directories = new Directories(this.path);
             this.ComponentOffset = 3;
 
@@ -29,9 +35,12 @@ namespace Editor.Windows
 
             this.IsOnLeft = true;
 
-            FileViewerWindow viewerWindow = new FileViewerWindow() { SelectedIndex = - 1};
-            this.DirectoryAdded += viewerWindow.DirectoryAdded;
+            FileViewerWindow viewerWindow = new FileViewerWindow(paths) { SelectedIndex = - 1};
+            this.DirectoryAdded += viewerWindow.DirectoryAdded;           
             this.fileViewer = viewerWindow;
+            if (IsSource) { this.fileViewer.Save += this.PushSaveUpSource; }
+            else { this.fileViewer.Save += this.PushSaveUpTarget; }
+            this.fileViewer.End += this.PushEndUp;
             this.fileViewer.Draw();
         }
 
@@ -68,10 +77,7 @@ namespace Editor.Windows
             }
             else if (info.Key == ConsoleKey.RightArrow)
             {
-                this.SelectedIndex = -1;
-                this.fileViewer.SelectedIndex = 0;
-                this.Draw();
-                this.Application.SwitchWindowForward(this.fileViewer);
+                this.KeyRight();
             }
             else
             {
@@ -92,6 +98,13 @@ namespace Editor.Windows
         private void Select()
         {
             this.DirectoryAdded?.Invoke(this.Components[this.SelectedIndex].Label);
+        }
+
+        private void KeyRight()
+        {
+            this.fileViewer.SelectedIndex = 0;
+            this.Draw();
+            this.Application.SwitchWindowForward(this.fileViewer);
         }
 
         private void ButtonPressed()
@@ -125,6 +138,21 @@ namespace Editor.Windows
         {
             this.directories = new Directories(this.path.Substring(0, this.path.Length - this.path.Split('\\')[this.path.Split('\\').Count() - 1].Length - 1));
             this.AddComponents();
+        }
+
+        private void PushSaveUpSource(List<string> paths)
+        {
+            this.SaveSource?.Invoke(paths);
+        }
+
+        private void PushSaveUpTarget(List<string> paths)
+        {
+            this.SaveTarget?.Invoke(paths);
+        }
+
+        private void PushEndUp()
+        {
+            this.End?.Invoke();
         }
     }
 }

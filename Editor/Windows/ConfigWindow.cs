@@ -28,6 +28,7 @@ namespace Editor.Windows
             {
                 Button button = new Button(backupJob.Name, 1);
                 button.Clicked += this.ButtonClicked;
+                button.Deleted += this.DeleteBackup;
                 this.Components.Add(button);
             }
 
@@ -49,10 +50,6 @@ namespace Editor.Windows
             else if (info.Key == ConsoleKey.UpArrow)
             {
                 this.KeyUp();
-            }
-            else if (info.Key == ConsoleKey.Delete)
-            {
-                this.DeleteBackup();
             }
             else
             {
@@ -122,6 +119,8 @@ namespace Editor.Windows
         {
             this.backupJobs[this.SelectedIndex] = backupJob;
             this.Components[this.SelectedIndex].Label = this.backupJobs[this.SelectedIndex].Name.ToString();
+
+            //this.service
         }
 
         private void RedrawTable()

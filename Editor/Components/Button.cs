@@ -11,6 +11,8 @@ namespace Editor.Components
     {
         public event Action Clicked;
 
+        public event Action Deleted;
+
         public Button(string label, int height)
         {
             this.Label = label;
@@ -30,6 +32,10 @@ namespace Editor.Components
             if (info.Key == ConsoleKey.Enter)
             {
                 this.Clicked?.Invoke();
+            }
+            if (info.Key == ConsoleKey.Delete)
+            {
+                this.Deleted?.Invoke();
             }
         }
     }

@@ -42,11 +42,11 @@ namespace Editor.Windows
             this.Components.Add(buttonRetention);
 
             Button buttonSources = new Button(this.backupJob.GetPropertyNames()[4], 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
-            buttonSources.Clicked += this.ButtonFiles;
+            buttonSources.Clicked += this.ButtonSources;
             this.Components.Add(buttonSources);
 
             Button buttonTargets = new Button(this.backupJob.GetPropertyNames()[5], 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
-            buttonTargets.Clicked += this.ButtonFiles;
+            buttonTargets.Clicked += this.ButtonTargets;
             this.Components.Add(buttonTargets);
 
             Button buttonOK = new Button("OK", 1);
@@ -143,7 +143,7 @@ namespace Editor.Windows
             textbox.Clicked += this.EditWindowClick;
             components.Add(textbox);
 
-            this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 50, 10));
+            this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 40, 10));
         }
 
         private void ButtonRetention()
@@ -157,12 +157,23 @@ namespace Editor.Windows
             button.Clicked += this.RetentionClick;
             components.Add(button);
 
-            this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups", components, 50, 10));
+            this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups and their size", components, 60, 10));
         }
 
-        private void ButtonFiles()
+        private void ButtonSources()
         {
-            this.Application.SwitchWindowForward(new FileSelectorWindow(this.backupJob.Sources.First(), this.Application));
+            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Sources, this.Application, true);
+            selectorWindow.SaveSource += this.SaveSource;
+            selectorWindow.End += this.RedrawTablePuhUp;
+            this.Application.SwitchWindowForward(selectorWindow);
+        }
+
+        private void ButtonTargets()
+        {
+            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Targets, this.Application, false);
+            selectorWindow.SaveTarget += this.SaveTarget;
+            selectorWindow.End += this.RedrawTablePuhUp;
+            this.Application.SwitchWindowForward(selectorWindow);
         }
 
         private void EditWindowClick()
@@ -223,6 +234,23 @@ namespace Editor.Windows
             }
 
             return result.Append(": " + list[list.Count - 1]).ToString();
+        }
+
+        private void SaveSource(List<string> paths)
+        {
+            this.backupJob.Sources = paths;
+        }
+
+        private void SaveTarget(List<string> paths)
+        {
+            this.backupJob.Targets = paths;
+        }
+
+        private void RedrawTablePuhUp()
+        {
+            this.Application.SwitchWindowBack();
+            this.RedrawTable?.Invoke();           
+            this.Application.SwitchWindowBack();
         }
     }
 }
