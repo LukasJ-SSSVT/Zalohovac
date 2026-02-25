@@ -9,12 +9,12 @@ namespace Editor
 {
     public class Application
     {
-        public Stack<Window> Window = new Stack<Window>();
+        public Stack<Window> Windows = new Stack<Window>();
 
         public Application()
         {
             //this.SwitchWindow(new ConfigWindow());          
-            this.Window.Push(new ConfigWindow(this));
+            this.Windows.Push(new ConfigWindow(this));
 
             this.DrawBorder();
         }
@@ -23,7 +23,7 @@ namespace Editor
         {
             while (true)
             {
-                this.Window.Peek().Draw();
+                this.Windows.Peek().Draw();
 
                 ConsoleKeyInfo info = Console.ReadKey();
 
@@ -32,23 +32,25 @@ namespace Editor
                     return;
                 }
 
-                this.Window.Peek().HandleKey(info);
+                this.Windows.Peek().HandleKey(info);
             }
         }
 
         public void SwitchWindowBack()
         {
-            this.Window.Pop();
+            this.Windows.Pop();
         }
 
         public void SwitchWindowForward(Window window)
         {
             window.Application = this;
-            this.Window.Push(window);
+            this.Windows.Push(window);
         }
 
         public void DrawBorder()
         {
+            Console.ResetColor();
+
             Console.Write("┌");
             for (int i = 1; i < Console.WindowWidth / 2; i++)
             {

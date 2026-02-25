@@ -31,7 +31,7 @@ namespace Editor.Windows
                 this.Components.Add(button);
             }
 
-            Button buttonAdd = new Button("Vytvořit zálohu", 1);
+            Button buttonAdd = new Button("Create backup", 1);
             buttonAdd.Clicked += this.CreateBackup;
             this.Components.Add(buttonAdd);
 
@@ -62,6 +62,7 @@ namespace Editor.Windows
 
         public override void Draw()
         {
+            Console.ResetColor();
             this.Clear(IsOnLeft);
 
             int i = 0;
@@ -99,6 +100,7 @@ namespace Editor.Windows
         {
             ConfigInfoWindow configInfoWindow = new ConfigInfoWindow(this.backupJobs[this.SelectedIndex].Clone());
             configInfoWindow.UpdateJobs += this.Update;
+            configInfoWindow.RedrawTable += this.RedrawTable;
             this.Application.SwitchWindowForward(configInfoWindow);
         }
 
@@ -109,7 +111,7 @@ namespace Editor.Windows
                 Id = this.backupJobs[this.SelectedIndex - 1].Id + 1,
             });
 
-            Button button = new Button("Nová záloha", 1);
+            Button button = new Button("New backup", 1);
             button.Clicked += this.ButtonClicked;
             this.Components.Insert(this.SelectedIndex, button);
 
@@ -120,6 +122,13 @@ namespace Editor.Windows
         {
             this.backupJobs[this.SelectedIndex] = backupJob;
             this.Components[this.SelectedIndex].Label = this.backupJobs[this.SelectedIndex].Name.ToString();
+        }
+
+        private void RedrawTable()
+        {
+            this.Application.DrawBorder();
+            this.Clear(this.IsOnLeft);
+            this.Draw();
         }
     }
 }

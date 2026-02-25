@@ -25,11 +25,11 @@ namespace Editor.Models
         public string Timing { get; set; } = "* * * * *";
 
         [JsonPropertyName("retention")] 
-        public BackupRetention BackupRetention { get; set; } = new BackupRetention() { Count = 1, Size = 1};
+        public BackupRetention Retention { get; set; } = new BackupRetention() { Count = 1, Size = 1};
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("method")]
-        public BackupType BackupType { get; set; } = BackupType.Full;
+        public BackupType Method { get; set; } = BackupType.Full;
 
 
         public BackupJob Clone()
@@ -41,11 +41,11 @@ namespace Editor.Models
                 Sources = new List<string>(this.Sources),
                 Targets = new List<string>(this.Targets),
                 Timing = this.Timing,
-                BackupType = this.BackupType,
-                BackupRetention = new BackupRetention
+                Method = this.Method,
+                Retention = new BackupRetention
                 {
-                    Count = this.BackupRetention.Count,
-                    Size = this.BackupRetention.Size
+                    Count = this.Retention.Count,
+                    Size = this.Retention.Size
                 }
             };
         }

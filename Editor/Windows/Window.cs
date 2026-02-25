@@ -74,11 +74,11 @@ namespace Editor.Windows
             }
         }
 
-        public void ComponentPositionsHorizontal(int windowWidth)
+        public void ComponentPositionsHorizontal(int windowWidth, int windowHeight)
         {
             for (int i = 0; i < this.Components.Count; i++)
             {
-                this.Components[i].Location = new Point((Console.WindowWidth / 2 - windowWidth / 2 + windowWidth / this.Components.Count * i) + windowWidth / this.Components.Count / 2 - this.Components[i].Label.Length / 2, Console.WindowHeight / 2 + 1);
+                this.Components[i].Location = new Point((Console.WindowWidth / 2 - windowWidth / 2 + windowWidth / this.Components.Count * i) + windowWidth / this.Components.Count / 2 - this.Components[i].Label.Length / 2, Console.WindowHeight / 2 + windowHeight / 2 - 3);
             }
         }
     }
