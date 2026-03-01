@@ -16,15 +16,9 @@ namespace Editor.Windows
 
         public event Action<string> DirectoryAdded;
 
-        public event Action<List<string>> SaveSource;
+        public FileViewerWindow FileViewer;
 
-        public event Action<List<string>> SaveTarget;
-
-        public event Action End;
-
-        private FileViewerWindow fileViewer;
-
-        public FileSelectorWindow(List<string> paths, Application app, bool IsSource)
+        public FileSelectorWindow(List<string> paths, Application app)
         {
             this.Application = app;
             this.path = paths[0];
@@ -37,11 +31,8 @@ namespace Editor.Windows
 
             FileViewerWindow viewerWindow = new FileViewerWindow(paths) { SelectedIndex = - 1};
             this.DirectoryAdded += viewerWindow.DirectoryAdded;           
-            this.fileViewer = viewerWindow;
-            if (IsSource) { this.fileViewer.Save += this.PushSaveUpSource; }
-            else { this.fileViewer.Save += this.PushSaveUpTarget; }
-            this.fileViewer.End += this.PushEndUp;
-            this.fileViewer.Draw();
+            this.FileViewer = viewerWindow;
+            this.FileViewer.Draw();
         }
 
         public override void Draw()
@@ -102,9 +93,9 @@ namespace Editor.Windows
 
         private void KeyRight()
         {
-            this.fileViewer.SelectedIndex = 0;
+            this.FileViewer.SelectedIndex = 0;
             this.Draw();
-            this.Application.SwitchWindowForward(this.fileViewer);
+            this.Application.SwitchWindowForward(this.FileViewer);
         }
 
         private void ButtonPressed()
@@ -139,21 +130,6 @@ namespace Editor.Windows
             this.path = this.path.Substring(0, this.path.Length - this.path.Split('\\')[this.path.Split('\\').Count() - 1].Length - 1);
             this.directories = new Directories(this.path);
             this.AddComponents();
-        }
-
-        private void PushSaveUpSource(List<string> paths)
-        {
-            this.SaveSource?.Invoke(paths);
-        }
-
-        private void PushSaveUpTarget(List<string> paths)
-        {
-            this.SaveTarget?.Invoke(paths);
-        }
-
-        private void PushEndUp()
-        {
-            this.End?.Invoke();
         }
     }
 }

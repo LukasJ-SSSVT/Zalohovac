@@ -120,7 +120,7 @@ namespace Editor.Windows
             this.backupJobs[this.SelectedIndex] = backupJob;
             this.Components[this.SelectedIndex].Label = this.backupJobs[this.SelectedIndex].Name.ToString();
 
-            //this.service
+            this.service.WirteJobs(this.backupJobs);
         }
 
         private void RedrawTable()

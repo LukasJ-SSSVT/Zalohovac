@@ -162,17 +162,17 @@ namespace Editor.Windows
 
         private void ButtonSources()
         {
-            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Sources, this.Application, true);
-            selectorWindow.SaveSource += this.SaveSource;
-            selectorWindow.End += this.RedrawTablePuhUp;
+            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Sources, this.Application);
+            selectorWindow.FileViewer.Save += this.SaveSource;
+            selectorWindow.FileViewer.End += this.RedrawTablePuhUp;
             this.Application.SwitchWindowForward(selectorWindow);
         }
 
         private void ButtonTargets()
         {
-            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Targets, this.Application, false);
-            selectorWindow.SaveTarget += this.SaveTarget;
-            selectorWindow.End += this.RedrawTablePuhUp;
+            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Targets, this.Application);
+            selectorWindow.FileViewer.Save += this.SaveTarget;
+            selectorWindow.FileViewer.End += this.RedrawTablePuhUp;
             this.Application.SwitchWindowForward(selectorWindow);
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -19,17 +20,12 @@ namespace Editor.Services
             return jobs;
         }
 
-        //public void WirteJobs(List<BackupJob> backupJobs)
-        //{
-        //    using (StreamWriter writer = new StreamWriter("Config.json"))
-        //    {
-        //        writer.Write("");
+        public void WirteJobs(List<BackupJob> backupJobs)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true , Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            string output = JsonSerializer.Serialize(backupJobs, options);
 
-        //        foreach (BackupJob backupJob in backupJobs)
-        //        {
-        //            writer.Write((JsonSerializer.SerializeToDocument(backupJob));
-        //        }
-        //    }
-        //}
+            File.WriteAllText("Config.json", output);
+        }
     }
 }
