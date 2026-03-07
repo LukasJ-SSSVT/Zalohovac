@@ -1,12 +1,13 @@
-﻿namespace Editor
+﻿using System.Text;
+
+namespace Editor
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            // use stack for windows
-            // don't use console.writeline but cursore position
             Console.CursorVisible = false;
+            Console.OutputEncoding = Encoding.UTF8;
 
             Application app = new Application();
             app.Run();

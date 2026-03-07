@@ -17,45 +17,33 @@ namespace Editor.Windows
 
         public event Action RedrawTable;
 
+        private event Action keyPressed;
+
         public ConfigInfoWindow(BackupJob backupJob)
         {
             this.backupJob = backupJob;
+            this.keyPressed += this.Clear;
 
-            this.ComponentOffset = Console.BufferWidth / 2 + 3;
+            this.ComponentOffset = Console.BufferWidth / 2 + 2;
 
-            this.IsOnLeft = false;
-
-            Textbox textbox = new Textbox(this.backupJob.GetPropertyNames()[0], this.backupJob.Name, 2, new Point(3, 1));
-            textbox.TextChanged += this.ChangeText;
-            this.Components.Add(textbox);
-
-            Button buttonMethod = new Button(this.backupJob.GetPropertyNames()[1], 2) { Text = this.backupJob.Method.ToString() };
-            buttonMethod.Clicked += this.ButtonMethod;
-            this.Components.Add(buttonMethod);
-
-            Button buttonTiming = new Button(this.backupJob.GetPropertyNames()[2], 2) { Text = this.backupJob.Timing.ToString() };
-            buttonTiming.Clicked += this.ButtonTiming;
-            this.Components.Add(buttonTiming);
-
-            Button buttonRetention = new Button(this.backupJob.GetPropertyNames()[3], 2) { Text = $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti: {this.backupJob.Retention.Size.ToString()}" };
-            buttonRetention.Clicked += this.ButtonRetention;
-            this.Components.Add(buttonRetention);
-
-            Button buttonSources = new Button(this.backupJob.GetPropertyNames()[4], 2); //{ Text = string.Join(",", this.backupJob.Sources).Substring(0, 20) + "..." };
-            buttonSources.Clicked += this.ButtonSources;
-            this.Components.Add(buttonSources);
-
-            Button buttonTargets = new Button(this.backupJob.GetPropertyNames()[5], 2); //{ Text = string.Join(",", this.backupJob.Targets).Substring(0, 20) + "..." };
-            buttonTargets.Clicked += this.ButtonTargets;
-            this.Components.Add(buttonTargets);
-
-            Button buttonOK = new Button("OK", 1);
-            buttonOK.Clicked += this.ButtonOK;
-            this.Components.Add(buttonOK);
-
-            Button buttonCancel = new Button("Cancel", 1);
-            buttonCancel.Clicked += this.ButtonCancel;
-            this.Components.Add(buttonCancel);
+            this.Components.Add(this.TextboxBuilder(this.backupJob.GetPropertyNames()[0], 2, this.ChangeText, () => { }, this.backupJob.Name, new Point(3, 1)));
+            this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[1], 2, this.ButtonMethod, () => { },
+                this.backupJob.Method.ToString()
+                ));
+            this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[2], 2, this.ButtonTiming, () => { },
+                this.backupJob.Timing.ToString()
+                ));
+            this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[3], 2, this.ButtonRetention, () => { },
+                $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti: {this.backupJob.Retention.Size.ToString()}"
+                ));
+            this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[4], 2, this.ButtonSources, () => { },
+                ""
+                ));
+            this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[5], 2, this.ButtonTargets, () => { },
+                ""
+                ));
+            this.Components.Add(this.ButtonBuilder("OK", 1, this.ButtonOK, () => { }, ""));
+            this.Components.Add(this.ButtonBuilder("Cancel", 1, this.ButtonCancel, () => { }, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
         }
@@ -79,7 +67,7 @@ namespace Editor.Windows
         public override void Draw()
         {
             Console.ResetColor();
-            this.Clear(this.IsOnLeft);
+            //this.Clear();
 
             int i = 0;
             foreach (Component component in this.Components)
@@ -95,11 +83,13 @@ namespace Editor.Windows
 
         private void KeyUp()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
         }
 
         private void KeyDown()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
         }
 
@@ -110,13 +100,13 @@ namespace Editor.Windows
 
         public void ButtonCancel()
         {
-            this.Clear(this.IsOnLeft);
+            this.Application.DrawBorder();
             this.Application.SwitchWindowBack();
         }
 
         public void ButtonOK()
         {
-            this.Clear(this.IsOnLeft);
+            this.Application.DrawBorder();
             this.UpdateJobs?.Invoke(this.backupJob);
             this.Application.SwitchWindowBack();
         }
@@ -128,9 +118,11 @@ namespace Editor.Windows
 
             foreach (string method in methods)
             {
-                Button button = new Button(method, 1);
-                button.Clicked += this.EditWindowClick;
-                components.Add(button);
+                //Button button = new Button(method, 1);
+                //button.Clicked += this.EditWindowClick;
+                //components.Add(button);
+
+                components.Add(this.ButtonBuilder(method, 1, this.EditWindowClick, () => { }, ""));
             }
 
             this.Application.SwitchWindowForward(new EditWindow("Choose a method", components, 60, 10));
@@ -139,9 +131,11 @@ namespace Editor.Windows
         private void ButtonTiming()
         {
             List<Component> components = new List<Component>();
-            Textbox textbox = new Textbox("", this.Components[2].Text, 1, new Point(0, 0));
-            textbox.Clicked += this.EditWindowClick;
-            components.Add(textbox);
+            //Textbox textbox = new Textbox("", this.Components[2].Text, 1, new Point(0, 0));
+            //textbox.Clicked += this.EditWindowClick;
+            //components.Add(textbox);
+
+            components.Add(this.TextboxBuilder("", 1, (str) => { }, this.EditWindowClick, this.Components[2].Text, new Point(0, 0)));
 
             this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 40, 10));
         }
@@ -149,31 +143,46 @@ namespace Editor.Windows
         private void ButtonRetention()
         {
             List<Component> components = new List<Component>();
-            Textbox textboxCount = new Textbox("", this.backupJob.Retention.Count.ToString(), 1, new Point(0, 0));
-            components.Add(textboxCount);
-            Textbox textboxSize = new Textbox("", this.backupJob.Retention.Size.ToString(), 1, new Point(0, 0));
-            components.Add(textboxSize);
-            Button button = new Button("OK", 1);
-            button.Clicked += this.RetentionClick;
-            components.Add(button);
-
+            //Textbox textboxCount = new Textbox("", this.backupJob.Retention.Count.ToString(), 1, new Point(0, 0));
+            //components.Add(textboxCount);
+            components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Count.ToString(), new Point(0, 0)));
+            //Textbox textboxSize = new Textbox("", this.backupJob.Retention.Size.ToString(), 1, new Point(0, 0));
+            //components.Add(textboxSize);
+            components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Size.ToString(), new Point(0, 0)));
+            //Button button = new Button("OK", 1);
+            //button.Clicked += this.RetentionClick;
+            //components.Add(button);
+            components.Add(this.ButtonBuilder("OK", 1, this.RetentionClick, () => { }, ""));
+            
             this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups and their size", components, 60, 10));
         }
 
         private void ButtonSources()
         {
-            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Sources, this.Application);
-            selectorWindow.FileViewer.Save += this.SaveSource;
-            selectorWindow.FileViewer.End += this.RedrawTablePuhUp;
-            this.Application.SwitchWindowForward(selectorWindow);
+            this.RedrawTable?.Invoke();
+            FileViewerWindow viewerWindow = new FileViewerWindow(this.backupJob.Sources, this.Application);
+            viewerWindow.Save += this.SaveSource;
+            viewerWindow.End += this.RedrawTablePuhUp;
+
+            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.backupJob.Sources[0], this.Application);
+            fileSelectorWindow.DirectoryAdded += viewerWindow.DirectoryAdded;
+
+            this.Application.SwitchWindowForward(viewerWindow);
+            this.Application.SwitchWindowForward(fileSelectorWindow);
         }
 
         private void ButtonTargets()
         {
-            FileSelectorWindow selectorWindow = new FileSelectorWindow(this.backupJob.Targets, this.Application);
-            selectorWindow.FileViewer.Save += this.SaveTarget;
-            selectorWindow.FileViewer.End += this.RedrawTablePuhUp;
-            this.Application.SwitchWindowForward(selectorWindow);
+            this.RedrawTable?.Invoke();
+            FileViewerWindow viewerWindow = new FileViewerWindow(this.backupJob.Targets, this.Application);
+            viewerWindow.Save += this.SaveTarget;
+            viewerWindow.End += this.RedrawTablePuhUp;
+
+            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.backupJob.Targets[0], this.Application);
+            fileSelectorWindow.DirectoryAdded += viewerWindow.DirectoryAdded;
+
+            this.Application.SwitchWindowForward(viewerWindow);
+            this.Application.SwitchWindowForward(fileSelectorWindow);
         }
 
         private void EditWindowClick()
@@ -249,8 +258,7 @@ namespace Editor.Windows
         private void RedrawTablePuhUp()
         {
             this.Application.SwitchWindowBack();
-            this.RedrawTable?.Invoke();           
-            this.Application.SwitchWindowBack();
+            this.RedrawTable?.Invoke();
         }
     }
 }

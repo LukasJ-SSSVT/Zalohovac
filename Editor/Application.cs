@@ -24,7 +24,7 @@ namespace Editor
             {
                 this.Windows.Peek().Draw();
 
-                ConsoleKeyInfo info = Console.ReadKey();
+                ConsoleKeyInfo info = Console.ReadKey(intercept: true);
 
                 if (info.Key == ConsoleKey.Escape)
                 {
@@ -49,14 +49,15 @@ namespace Editor
         public void DrawBorder()
         {
             Console.ResetColor();
+            Console.Clear();
 
             Console.Write("┌");
-            for (int i = 1; i < Console.WindowWidth / 2; i++)
+            for (int i = 1; i < Console.WindowWidth / 2 - 1; i++)
             {
                 Console.Write("─");
             }
             Console.Write("╥");
-            for (int i = Console.WindowWidth / 2; i < Console.WindowWidth - 2; i++)
+            for (int i = Console.WindowWidth / 2 - 1; i < Console.WindowWidth - 2; i++)
             {
                 Console.Write("─");
             }
@@ -66,19 +67,19 @@ namespace Editor
             {
                 Console.SetCursorPosition(0, i);
                 Console.Write("│");
-                Console.SetCursorPosition(Console.WindowWidth / 2, i);
+                Console.SetCursorPosition(Console.WindowWidth / 2 - 1, i);
                 Console.Write("║");
                 Console.SetCursorPosition(Console.WindowWidth - 1, i);
                 Console.Write("│");
             }
 
             Console.Write("└");
-            for (int i = 1; i < Console.WindowWidth / 2; i++)
+            for (int i = 1; i < Console.WindowWidth / 2 - 1; i++)
             {
                 Console.Write("─");
             }
             Console.Write("╨");
-            for (int i = Console.WindowWidth / 2; i < Console.WindowWidth - 2; i++)
+            for (int i = Console.WindowWidth / 2 - 1; i < Console.WindowWidth - 2; i++)
             {
                 Console.Write("─");
             }

@@ -46,6 +46,7 @@ namespace Editor.Windows
                 component.Draw();
                 Console.BackgroundColor = ConsoleColor.White;
             }
+            Console.ResetColor();
         }
 
         public void HighlightButton(ConsoleColor color)

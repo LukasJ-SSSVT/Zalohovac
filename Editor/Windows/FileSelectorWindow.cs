@@ -16,29 +16,24 @@ namespace Editor.Windows
 
         public event Action<string> DirectoryAdded;
 
-        public FileViewerWindow FileViewer;
+        private event Action keyPressed;
 
-        public FileSelectorWindow(List<string> paths, Application app)
+        public FileSelectorWindow(string path, Application app)
         {
+            this.keyPressed += this.Clear;
+
             this.Application = app;
-            this.path = paths[0];
+            this.path = path;
             this.directories = new Directories(this.path);
             this.ComponentOffset = 3;
 
             this.AddComponents();
-
-            this.IsOnLeft = true;
-
-            FileViewerWindow viewerWindow = new FileViewerWindow(paths) { SelectedIndex = - 1};
-            this.DirectoryAdded += viewerWindow.DirectoryAdded;           
-            this.FileViewer = viewerWindow;
-            this.FileViewer.Draw();
         }
 
         public override void Draw()
         {
             Console.ResetColor();
-            this.Clear(IsOnLeft);
+            if (this.SelectedIndex >= 0) { this.Clear(); }
 
             int i = 0;
             foreach (Component component in this.Components)
@@ -78,11 +73,13 @@ namespace Editor.Windows
 
         private void KeyUp()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
         }
 
         private void KeyDown()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
         }
 
@@ -93,14 +90,15 @@ namespace Editor.Windows
 
         private void KeyRight()
         {
-            this.FileViewer.SelectedIndex = 0;
+            this.Clear();
+            this.SelectedIndex = -1;
             this.Draw();
-            this.Application.SwitchWindowForward(this.FileViewer);
+            this.Application.SwitchWindowBack();
         }
 
         private void ButtonPressed()
         {
-            this.path = this.Components[this.SelectedIndex + 1].Label;
+            this.path = this.Components[this.SelectedIndex].Label;
             this.directories = new Directories(this.path);
             this.AddComponents();
         }
@@ -109,15 +107,19 @@ namespace Editor.Windows
         {
             this.Components.Clear();
 
-            Button buttonBack = new Button("..", 1);
-            buttonBack.Clicked += this.ButtonBack;
-            this.Components.Add(buttonBack);
+            //Button buttonBack = new Button("..", 1);
+            //buttonBack.Clicked += this.ButtonBack;
+            //this.Components.Add(buttonBack);
+
+            this.Components.Add(this.ButtonBuilder("..", 1, this.ButtonBack, () => { }, ""));
 
             foreach (DirectoryInfo item in directories)
             {
-                Button button = new Button(item.FullName, 1);
-                button.Clicked += this.ButtonPressed;
-                this.Components.Add(button);
+                //Button button = new Button(item.FullName, 1);
+                //button.Clicked += this.ButtonPressed;
+                //this.Components.Add(button);
+
+                this.Components.Add(this.ButtonBuilder(item.FullName, 1, this.ButtonPressed, () => { }, ""));
             }
 
             this.ComponentPositionsVertical(this.ComponentOffset);

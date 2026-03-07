@@ -16,8 +16,13 @@ namespace Editor.Windows
 
         private DataService service = new DataService();
 
+        private event Action keyPressed;
+
+
         public ConfigWindow(Application app)
         {
+            this.keyPressed += this.Clear;
+
             this.Application = app;
 
             this.backupJobs = this.service.GetAllBackupJobs();
@@ -26,19 +31,21 @@ namespace Editor.Windows
 
             foreach (BackupJob backupJob in this.backupJobs)
             {
-                Button button = new Button(backupJob.Name, 1);
-                button.Clicked += this.ButtonClicked;
-                button.Deleted += this.DeleteBackup;
-                this.Components.Add(button);
+                //Button button = new Button(backupJob.Name, 1);
+                //button.Clicked += this.ButtonClicked;
+                //button.Deleted += this.DeleteBackup;
+                //this.Components.Add(button);
+
+                this.Components.Add(this.ButtonBuilder(backupJob.Name, 1, this.ButtonClicked, this.DeleteBackup, ""));
             }
 
-            Button buttonAdd = new Button("Create backup", 1);
-            buttonAdd.Clicked += this.CreateBackup;
-            this.Components.Add(buttonAdd);
+            //Button buttonAdd = new Button("Create backup", 1);
+            //buttonAdd.Clicked += this.CreateBackup;
+            //this.Components.Add(buttonAdd);
+
+            this.Components.Add(this.ButtonBuilder("Create backup", 1, this.CreateBackup, () => { }, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
-
-            this.IsOnLeft = true;
         }
 
         public override void HandleKey(ConsoleKeyInfo info)
@@ -60,7 +67,7 @@ namespace Editor.Windows
         public override void Draw()
         {
             Console.ResetColor();
-            this.Clear(IsOnLeft);
+            this.Clear();
 
             int i = 0;
             foreach (Component component in this.Components)
@@ -76,11 +83,13 @@ namespace Editor.Windows
 
         private void KeyUp()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
         }
 
         private void KeyDown()
         {
+            this.keyPressed?.Invoke();
             this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
         }
 
@@ -108,9 +117,9 @@ namespace Editor.Windows
                 Id = this.backupJobs[this.SelectedIndex - 1].Id + 1,
             });
 
-            Button button = new Button("New backup", 1);
-            button.Clicked += this.ButtonClicked;
-            this.Components.Insert(this.SelectedIndex, button);
+            //Button button = new Button("New backup", 1);
+            //button.Clicked += this.ButtonClicked;
+            this.Components.Insert(this.SelectedIndex, this.ButtonBuilder("New backup", 1, this.ButtonClicked, () => { }, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
         }
@@ -126,7 +135,7 @@ namespace Editor.Windows
         private void RedrawTable()
         {
             this.Application.DrawBorder();
-            this.Clear(this.IsOnLeft);
+            this.Clear();
             this.Draw();
         }
     }
