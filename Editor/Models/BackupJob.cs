@@ -27,10 +27,10 @@ namespace Editor.Models
         public BackupRetention Retention { get; set; } = new BackupRetention() { Count = 1, Size = 1 };
 
         [JsonPropertyName("sources")]
-        public List<string> Sources { get; set; } = new List<string>();
+        public List<string> Sources { get; set; } = new List<string>() { "C:\\"};
 
         [JsonPropertyName("targets")]
-        public List<string> Targets { get; set; } = new List<string>();
+        public List<string> Targets { get; set; } = new List<string>() { "C:\\" };
 
         public List<string> GetPropertyNames()
         {

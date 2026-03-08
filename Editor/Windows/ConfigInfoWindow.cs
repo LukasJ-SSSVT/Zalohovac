@@ -22,7 +22,7 @@ namespace Editor.Windows
         public ConfigInfoWindow(BackupJob backupJob)
         {
             this.backupJob = backupJob;
-            this.keyPressed += this.Clear;
+            this.keyPressed += this.ClearBackground;
 
             this.ComponentOffset = Console.BufferWidth / 2 + 2;
 
@@ -67,7 +67,6 @@ namespace Editor.Windows
         public override void Draw()
         {
             Console.ResetColor();
-            //this.Clear();
 
             int i = 0;
             foreach (Component component in this.Components)
@@ -115,13 +114,8 @@ namespace Editor.Windows
         {
             List<string> methods = Enum.GetValues(typeof(BackupType)).Cast<BackupType>().Select(v => v.ToString()).ToList();
             List<Component> components = new List<Component>();
-
             foreach (string method in methods)
             {
-                //Button button = new Button(method, 1);
-                //button.Clicked += this.EditWindowClick;
-                //components.Add(button);
-
                 components.Add(this.ButtonBuilder(method, 1, this.EditWindowClick, () => { }, ""));
             }
 
@@ -131,10 +125,6 @@ namespace Editor.Windows
         private void ButtonTiming()
         {
             List<Component> components = new List<Component>();
-            //Textbox textbox = new Textbox("", this.Components[2].Text, 1, new Point(0, 0));
-            //textbox.Clicked += this.EditWindowClick;
-            //components.Add(textbox);
-
             components.Add(this.TextboxBuilder("", 1, (str) => { }, this.EditWindowClick, this.Components[2].Text, new Point(0, 0)));
 
             this.Application.SwitchWindowForward(new EditWindow("Create cron", components, 40, 10));
@@ -143,15 +133,8 @@ namespace Editor.Windows
         private void ButtonRetention()
         {
             List<Component> components = new List<Component>();
-            //Textbox textboxCount = new Textbox("", this.backupJob.Retention.Count.ToString(), 1, new Point(0, 0));
-            //components.Add(textboxCount);
             components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Count.ToString(), new Point(0, 0)));
-            //Textbox textboxSize = new Textbox("", this.backupJob.Retention.Size.ToString(), 1, new Point(0, 0));
-            //components.Add(textboxSize);
             components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Size.ToString(), new Point(0, 0)));
-            //Button button = new Button("OK", 1);
-            //button.Clicked += this.RetentionClick;
-            //components.Add(button);
             components.Add(this.ButtonBuilder("OK", 1, this.RetentionClick, () => { }, ""));
             
             this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups and their size", components, 60, 10));

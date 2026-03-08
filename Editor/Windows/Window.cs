@@ -37,7 +37,7 @@ namespace Editor.Windows
             }
         }
 
-        public void Clear()
+        public void ClearBackground()
         {
             Console.BackgroundColor = ConsoleColor.Black;
 
@@ -91,6 +91,20 @@ namespace Editor.Windows
             textbox.Clicked += clicked;
 
             return textbox;
+        }
+
+        public void ClearAll()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            for (int y = 1; y < Console.WindowHeight - 1; y++)
+            {
+                for (int x = this.Components[this.SelectedIndex].Location.X - 2; x < Console.WindowWidth / 2 + this.Components[this.SelectedIndex].Location.X - 4; x++)
+                {
+                    Console.SetCursorPosition(x, y);
+                    Console.Write(" ");
+                }
+            }
         }
     }
 }

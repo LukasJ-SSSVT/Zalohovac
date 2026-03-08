@@ -19,28 +19,16 @@ namespace Editor.Windows
         {
             this.Application = app;
 
-            this.keyPressed += this.Clear;
+            this.keyPressed += this.ClearBackground;
 
             this.ComponentOffset = Console.BufferWidth / 2 + 2;
 
             foreach (string path in paths)
             {
-                //Button button = new Button(path, 1);
-                //button.Deleted += this.DeletePath;
-                //this.Components.Add(button);
-
                 this.Components.Add(this.ButtonBuilder(path, 1, () => { }, this.DeletePath, ""));
             }
 
-
-            //Button buttonOK = new Button("OK", 1);
-            //buttonOK.Clicked += this.ButtonOK;
-            //this.Components.Add(buttonOK);
             this.Components.Add(this.ButtonBuilder("OK", 1, this.ButtonOK, () => { }, ""));
-
-            //Button buttonCancel = new Button("Cancel", 1);
-            //buttonCancel.Clicked += this.ButtonCancel;
-            //this.Components.Add(buttonCancel);
             this.Components.Add(this.ButtonBuilder("Cancel", 1, this.ButtonCancel, () => { }, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
@@ -52,7 +40,7 @@ namespace Editor.Windows
         public override void Draw()
         {
             Console.ResetColor();
-            this.Clear();
+            this.ClearBackground();
 
             int i = 0;
             foreach (Component component in this.Components)
@@ -107,8 +95,6 @@ namespace Editor.Windows
 
         public void DirectoryAdded(string path)
         {
-            //Button button = new Button(path, 1);
-            //button.Deleted += this.DeletePath;
             this.Components.Insert(this.Components.Count() - 2, this.ButtonBuilder(path, 1, () => { }, this.DeletePath, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
@@ -137,6 +123,8 @@ namespace Editor.Windows
 
         private void DeletePath()
         {
+            this.ClearAll();
+
             this.Components.RemoveAt(this.SelectedIndex);
             this.ComponentPositionsVertical(this.ComponentOffset);
         }
