@@ -72,7 +72,7 @@ namespace Editor.Windows
             for (int i = this.startIndex; i < endIndex; i++)
             {
                 Component component = this.Components[i];
-                component.Location = new Point(component.Location.X, (i - startIndex) * (component.Height + 2)  + this.ComponentOffset);
+                component.Location = new Point(component.Location.X, (i - startIndex) * (component.Height + 2) + 3);
 
                 if (i == this.SelectedIndex)
                 {

@@ -11,7 +11,7 @@ namespace Editor.Windows
 {
     public class FileSelectorWindow : Window
     {
-        private string path;
+        private string path = "C:\\";
 
         private Directories directories;
 
@@ -23,12 +23,11 @@ namespace Editor.Windows
         private int displayedCount = Console.WindowHeight / 3 - 2;
         private bool hasScrolled = false;
 
-        public FileSelectorWindow(string path, Application app)
+        public FileSelectorWindow(Application app)
         {
             this.keyPressed += this.ClearBackground;
 
             this.Application = app;
-            this.path = path;
             this.directories = new Directories(this.path);
             this.ComponentOffset = 3;
 
@@ -53,7 +52,7 @@ namespace Editor.Windows
             for (int i = this.startIndex; i < endIndex; i++)
             {
                 Component component = this.Components[i];
-                component.Location = new Point(component.Location.X, (i - startIndex) * (component.Height + 2) + this.ComponentOffset);
+                component.Location = new Point(component.Location.X, (i - startIndex) * (component.Height + 2) + 3);
 
                 if (i == this.SelectedIndex)
                 {
@@ -101,6 +100,8 @@ namespace Editor.Windows
                     this.startIndex--;
                     this.hasScrolled = true;
                 }
+
+                if (this.SelectedIndex == 1 && this.startIndex > 0) { this.startIndex--; }
             }
         }
 
@@ -121,7 +122,16 @@ namespace Editor.Windows
 
         private void Select()
         {
-            if (this.SelectedIndex >= 2) { this.DirectoryAdded?.Invoke(this.Components[0].Label + '\\' + this.Components[this.SelectedIndex].Label); }
+            if (this.SelectedIndex < 2) { return; }
+
+            if (this.Components[0].Label.Substring(this.Components[0].Label.Length - 1).Contains('\\'))
+            {
+                this.DirectoryAdded?.Invoke(this.Components[0].Label + this.Components[this.SelectedIndex].Label);
+            }
+            else
+            {
+                this.DirectoryAdded?.Invoke(this.Components[0].Label + '\\' + this.Components[this.SelectedIndex].Label);
+            }
         }
 
         private void KeyRight()

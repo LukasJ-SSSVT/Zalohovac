@@ -1,6 +1,8 @@
 ﻿using Editor.Components;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +16,10 @@ namespace Editor.Windows
         public event Action End;
 
         private event Action keyPressed;
+
+        private int startIndex = 0;
+        private int displayedCount = Console.WindowHeight / 3 - 2;
+        private bool hasScrolled = false;
 
         public FileViewerWindow(List<string> paths, Application app)
         {
@@ -40,15 +46,24 @@ namespace Editor.Windows
         public override void Draw()
         {
             Console.ResetColor();
-            this.ClearBackground();
-
-            int i = 0;
-            foreach (Component component in this.Components)
+            if (this.hasScrolled)
             {
-                if (i++ == this.SelectedIndex)
+                this.ClearAll();
+                this.hasScrolled = false;
+            }
+
+            int endIndex = Math.Min(this.startIndex + this.displayedCount, this.Components.Count);
+
+            for (int i = this.startIndex; i < endIndex; i++)
+            {
+                Component component = this.Components[i];
+                component.Location = new Point(component.Location.X, (i - startIndex) * (component.Height + 2) + 3);
+
+                if (i == this.SelectedIndex)
                 {
                     this.HiglightRow(component.Location, component.Height, ConsoleColor.Blue);
                 }
+
                 component.Draw();
                 Console.ResetColor();
             }
@@ -77,18 +92,36 @@ namespace Editor.Windows
         private void KeyUp()
         {
             this.keyPressed?.Invoke();
-            this.SelectedIndex = Math.Max(--this.SelectedIndex, 0);
+            if (this.SelectedIndex > 0)
+            {
+                this.SelectedIndex--;
+
+                if (this.SelectedIndex < this.startIndex)
+                {
+                    this.startIndex--;
+                    this.hasScrolled = true;
+                }
+            }
         }
 
         private void KeyDown()
         {
             this.keyPressed?.Invoke();
-            this.SelectedIndex = Math.Min(++this.SelectedIndex, this.Components.Count - 1);
+            if (this.SelectedIndex < this.Components.Count - 1)
+            {
+                this.SelectedIndex++;
+
+                if (this.SelectedIndex >= this.startIndex + this.displayedCount)
+                {
+                    this.startIndex++;
+                    this.hasScrolled = true;
+                }
+            }
         }
 
         private void KeyLeft()
         {
-            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.Components[0].Label, this.Application);
+            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.Application);
             fileSelectorWindow.DirectoryAdded += this.DirectoryAdded;
             this.Application.SwitchWindowForward(fileSelectorWindow);
         }
@@ -98,6 +131,8 @@ namespace Editor.Windows
             this.Components.Insert(this.Components.Count() - 2, this.ButtonBuilder(path, 1, () => { }, this.DeletePath, ""));
 
             this.ComponentPositionsVertical(this.ComponentOffset);
+
+            this.ClearAll();
 
             this.Draw();
         }

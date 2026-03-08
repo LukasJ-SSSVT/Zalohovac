@@ -37,10 +37,10 @@ namespace Editor.Windows
                 $"Počet záloh: {this.backupJob.Retention.Count.ToString()} o velikosti: {this.backupJob.Retention.Size.ToString()}"
                 ));
             this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[4], 2, this.ButtonSources, () => { },
-                ""
+                this.FilePaths(this.backupJob.Sources)
                 ));
             this.Components.Add(this.ButtonBuilder(this.backupJob.GetPropertyNames()[5], 2, this.ButtonTargets, () => { },
-                ""
+                this.FilePaths(this.backupJob.Targets)
                 ));
             this.Components.Add(this.ButtonBuilder("OK", 1, this.ButtonOK, () => { }, ""));
             this.Components.Add(this.ButtonBuilder("Cancel", 1, this.ButtonCancel, () => { }, ""));
@@ -136,7 +136,7 @@ namespace Editor.Windows
             components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Count.ToString(), new Point(0, 0)));
             components.Add(this.TextboxBuilder("", 1, (str) => { }, () => { }, this.backupJob.Retention.Size.ToString(), new Point(0, 0)));
             components.Add(this.ButtonBuilder("OK", 1, this.RetentionClick, () => { }, ""));
-            
+
             this.Application.SwitchWindowForward(new EditWindow("Imput amount of backups and their size", components, 60, 10));
         }
 
@@ -147,7 +147,7 @@ namespace Editor.Windows
             viewerWindow.Save += this.SaveSource;
             viewerWindow.End += this.RedrawTablePuhUp;
 
-            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.backupJob.Sources[0], this.Application);
+            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.Application);
             fileSelectorWindow.DirectoryAdded += viewerWindow.DirectoryAdded;
 
             this.Application.SwitchWindowForward(viewerWindow);
@@ -161,7 +161,7 @@ namespace Editor.Windows
             viewerWindow.Save += this.SaveTarget;
             viewerWindow.End += this.RedrawTablePuhUp;
 
-            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.backupJob.Targets[0], this.Application);
+            FileSelectorWindow fileSelectorWindow = new FileSelectorWindow(this.Application);
             fileSelectorWindow.DirectoryAdded += viewerWindow.DirectoryAdded;
 
             this.Application.SwitchWindowForward(viewerWindow);
@@ -231,17 +231,41 @@ namespace Editor.Windows
         private void SaveSource(List<string> paths)
         {
             this.backupJob.Sources = paths;
+            this.Components[4].Text = this.FilePaths(paths);
         }
 
         private void SaveTarget(List<string> paths)
         {
             this.backupJob.Targets = paths;
+            this.Components[5].Text = this.FilePaths(paths);
         }
 
         private void RedrawTablePuhUp()
         {
             this.Application.SwitchWindowBack();
             this.RedrawTable?.Invoke();
+        }
+
+        private string FilePaths(List<string> paths)
+        {
+            string result = "";
+            int i = 0;
+
+            foreach (string path in paths)
+            {
+                result += path + ", ";
+                i++;
+            }
+
+            result = result.Substring(0, result.Length - 2);
+
+            if (result.Length > Console.WindowWidth / 2 - 10)
+            {
+                result = result.PadRight(Console.WindowWidth / 2 - 10);
+                result = result.Substring(0, result.Length - result.Split(',')[result.Split(',').Count() - 1].Length) + "...";
+            }
+
+            return result;
         }
     }
 }
