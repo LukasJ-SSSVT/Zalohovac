@@ -1,4 +1,5 @@
-﻿using Editor.Windows;
+﻿using Editor.Models;
+using Editor.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Editor
     public class Application
     {
         public Stack<Window> Windows = new Stack<Window>();
+
+        private Frame frame = new Frame();
 
         public Application()
         {   
@@ -48,42 +51,7 @@ namespace Editor
 
         public void DrawBorder()
         {
-            Console.ResetColor();
-            Console.Clear();
-
-            Console.Write("┌");
-            for (int i = 1; i < Console.WindowWidth / 2 - 1; i++)
-            {
-                Console.Write("─");
-            }
-            Console.Write("╥");
-            for (int i = Console.WindowWidth / 2 - 1; i < Console.WindowWidth - 2; i++)
-            {
-                Console.Write("─");
-            }
-            Console.Write("┐");
-
-            for (int i = 1; i < Console.WindowHeight - 1; i++)
-            {
-                Console.SetCursorPosition(0, i);
-                Console.Write("│");
-                Console.SetCursorPosition(Console.WindowWidth / 2 - 1, i);
-                Console.Write("║");
-                Console.SetCursorPosition(Console.WindowWidth - 1, i);
-                Console.Write("│");
-            }
-
-            Console.Write("└");
-            for (int i = 1; i < Console.WindowWidth / 2 - 1; i++)
-            {
-                Console.Write("─");
-            }
-            Console.Write("╨");
-            for (int i = Console.WindowWidth / 2 - 1; i < Console.WindowWidth - 2; i++)
-            {
-                Console.Write("─");
-            }
-            Console.Write("┘");
+            this.frame.Draw();
         }
     }
 }

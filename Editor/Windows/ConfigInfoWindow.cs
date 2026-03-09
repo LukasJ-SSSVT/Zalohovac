@@ -249,19 +249,17 @@ namespace Editor.Windows
         private string FilePaths(List<string> paths)
         {
             string result = "";
-            int i = 0;
 
             foreach (string path in paths)
             {
                 result += path + ", ";
-                i++;
             }
 
             result = result.Substring(0, result.Length - 2);
 
-            if (result.Length > Console.WindowWidth / 2 - 10)
+            if (result.Length > Console.WindowWidth / 2 - 15)
             {
-                result = result.PadRight(Console.WindowWidth / 2 - 10);
+                result = result.PadRight(Console.WindowWidth / 2 - 15);
                 result = result.Substring(0, result.Length - result.Split(',')[result.Split(',').Count() - 1].Length) + "...";
             }
 
